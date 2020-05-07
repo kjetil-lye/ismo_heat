@@ -4,9 +4,16 @@ import scipy.sparse.linalg
 
 
 def solve_heat_equation(initial_data: callable(numpy.ndarray), dt: float, dx: float, end_time: float, a: float = 0.0,
-                        b: float = 1):
+                        b: float = 1, q: float = 1.0):
     """
     Solves the heat equation on the domain [a, b]
+
+    Here we view the heat equation as
+
+        u_t + q u_{xx} = 0
+
+    with Dirichlet boundary conditions (u=0 on the boundary)
+
     :param b: end point of domain
     :param a: start point of domain
     :param initial_data: a function that can compute the initial data
@@ -23,31 +30,31 @@ def solve_heat_equation(initial_data: callable(numpy.ndarray), dt: float, dx: fl
     u[1:-1] = initial_data(x)
     h = dt / dx ** 2
 
+    # Create sparse matrix
+    A = scipy.sparse.lil_matrix((number_of_spatial_points, number_of_spatial_points))
+
+    # Loop over matrix entries
+    for j in range(1, number_of_spatial_points + 1):  # j = 1,..., N
+        A[j - 1, j - 1] = 1 + h * q
+
+        if j > 1:
+            A[j - 1, j - 2] = -h * q / 2
+        if j < number_of_spatial_points:
+            A[j - 1, j] = -h * q / 2
+
+    # Our sparse solver likes the CSR format better
+    A = A.tocsr()
+
     # Time loop
     t = 0
+
     while t < end_time:
-
-        # Create sparse matrix
-        A = scipy.sparse.lil_matrix((number_of_spatial_points, number_of_spatial_points))
-
-        # Loop over matrix entries
-        for j in range(1, number_of_spatial_points + 1):  # j = 1,..., N
-            A[j - 1, j - 1] = 1 + h
-
-            if j > 1:
-                A[j - 1, j - 2] = -h / 2
-            if j < number_of_spatial_points:
-                A[j - 1, j] = -h / 2
-
-        # Our sparse solver likes the CSR format better
-        A = A.tocsr()
-
         # Bulid RHS
-        F = h / 2 * u[:-2] + h / 2 * u[2:] + (1 - h) * u[1:-1]
+        F = h * q / 2 * u[:-2] + h * q / 2 * u[2:] + (1 - h * q) * u[1:-1]
 
         # Solve matrix system
 
-        u[1:-1] = scipy.sparse.linal.spsolve(A, F)
+        u[1:-1] = scipy.sparse.linalg.spsolve(A, F)
 
         # Boundary conditions are handled automatically since
         # U is zero everywhere in the beginning
@@ -55,4 +62,4 @@ def solve_heat_equation(initial_data: callable(numpy.ndarray), dt: float, dx: fl
         # update time
         t += dt
 
-    return u
+    return u[1:-1]
