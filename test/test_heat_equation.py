@@ -63,9 +63,7 @@ class TestHeatEquation(unittest.TestCase):
 
             x = np.arange(0, 1, dx)
 
-            exact_solution = sum(
-                coefficient * np.exp(-(k * np.pi) ** 2 * end_time) * np.sin(k * np.pi * x) for k, coefficient in
-                enumerate(coefficients))
+            exact_solution = initial_data.exact_solution(x, end_time)
 
             difference_in_l2_norm = np.linalg.norm((exact_solution - solution_to_heat_equation) * dx, ord=2)
 
@@ -125,9 +123,7 @@ class TestHeatEquation(unittest.TestCase):
 
             x = np.arange(0, 1, dx)
 
-            exact_solution = sum(
-                coefficient * np.exp(-q * (k * np.pi) ** 2 * end_time) * np.sin(k * np.pi * x) for k, coefficient in
-                enumerate(coefficients))
+            exact_solution = initial_data.exact_solution(x, end_time, q)
 
             difference_in_l2_norm = np.linalg.norm((exact_solution - solution_to_heat_equation) * dx, ord=2)
 

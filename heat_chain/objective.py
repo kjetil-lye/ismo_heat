@@ -1,5 +1,5 @@
 import numpy as np
-
+from heat import InitialDataControlSine
 
 class Objective(object):
     def __init__(self, coefficients=[1, 2, 3, 4, 5], q=1.0, end_time=1.0,
@@ -8,12 +8,10 @@ class Objective(object):
         self.end_time = end_time
         self.q = q
         self.control_points = control_points
+        self.initial_data = InitialDataControlSine(coefficients)
 
     def exact_solution(self, x):
-        exact_solution = sum(
-            coefficient * np.exp(-self.q * (k * np.pi) ** 2 * self.end_time) * np.sin(k * np.pi * x) for k, coefficient
-            in
-            enumerate(self.coefficients))
+        exact_solution = self.initial_data.exact_solution(x, self.end_time, self.q)
 
         return exact_solution
 
