@@ -47,11 +47,13 @@ initial_data = objective_function.initial_data
 
 
 end_time = objective_parameters['end_time']
-plt.plot(x, initial_data.exact_solution(x, end_time), label='exact true')
+#plt.plot(x, initial_data.exact_solution(x, end_time), label='exact true')
 
 objective_function_approximated = objective.Objective(end_time=end_time, coefficients=coefficients_per_iteration[-1,1:],
     q=coefficients_per_iteration[-1,0], control_points=objective_parameters['control_points'])
-plt.plot(x, objective_function_approximated.initial_data.exact_solution(x, end_time), label='exact ISMO')
+
+plt.plot(x, objective_function_approximated.initial_data(x), '--', label='Initial data')
+plt.plot(x, objective_function_approximated.initial_data.exact_solution(x, end_time), label='Evolved data')
 plt.plot(objective_parameters['control_points'],
     initial_data.exact_solution(np.array(objective_parameters['control_points']), end_time),
      '*', label='Control points', markersize=15)
