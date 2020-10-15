@@ -4,6 +4,7 @@ import numpy
 import sys
 import objective
 import heat
+import plot_info
 with open('objective_parameters.json') as f:
     objective_parameters = json.load(f)
 
@@ -22,4 +23,4 @@ plt.plot(x, initial_data(x), label='initial')
 plt.plot(x, solution, '*', label='numerical')
 plt.plot(x, initial_data.exact_solution(x, end_time), label='exact')
 plt.legend()
-plt.show()
+plot_info.showAndSave("heat_exact_solution")

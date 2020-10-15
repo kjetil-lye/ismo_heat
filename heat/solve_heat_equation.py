@@ -49,6 +49,9 @@ def solve_heat_equation(initial_data: callable(numpy.ndarray), dt: float, dx: fl
     t = 0
 
     while t < end_time:
+        # adjust dt at the end to match exactly:
+        dt = min(dt, end_time - t)
+
         # Bulid RHS
         F = h * q / 2 * u[:-2] + h * q / 2 * u[2:] + (1 - h * q) * u[1:-1]
 
@@ -58,6 +61,7 @@ def solve_heat_equation(initial_data: callable(numpy.ndarray), dt: float, dx: fl
 
         # Boundary conditions are handled automatically since
         # U is zero everywhere in the beginning
+
 
         # update time
         t += dt
